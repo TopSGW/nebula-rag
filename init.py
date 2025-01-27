@@ -24,6 +24,10 @@ from llama_index.embeddings.ollama import OllamaEmbedding
 # Load environment variables from .env file
 load_dotenv()
 
+os.environ['NEBULA_USER'] = os.environ["NEBULA_USER"]
+os.environ['NEBULA_PASSWORD'] = os.environ["NEBULA_PASSWORD"]
+os.environ['NEBULA_ADDRESS'] = os.environ["NEBULA_ADDRESS"]
+
 Settings.llm = Ollama(
     model="llama3.3:70b",
     temperature=0.3,
