@@ -1,5 +1,5 @@
 import os
-
+import subprocess
 import logging
 import sys
 
@@ -35,6 +35,28 @@ Settings.embed_model = OllamaEmbedding(
     model_name="llama3.3:70b",
     base_url="http://localhost:11434",
 )
+
+# Define the command to source the openrc file and print environment variables
+source_command = 'bash -c ". openrc && env"'
+
+# Run the command and capture its output
+completed_process = subprocess.run(source_command, shell=True, stdout=subprocess.PIPE, text=True)
+
+# Parse the output to extract environment variables
+env_output = completed_process.stdout
+env_lines = env_output.splitlines()
+env_variables = {}
+
+for line in env_lines:
+    key, value = line.split('=', 1)
+    if any([
+        "NEBULA" in key,
+        "GRAPH" in key,
+    ]):
+        env_variables[key] = value
+
+os.environ.update(env_variables)
+
 
 Settings.chunk_size = 512
 
