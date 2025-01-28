@@ -65,7 +65,7 @@ retriever = graph_index.as_retriever(
 
 retriever_response = retriever.retrieve("Who are the founders of BlackRock?")
 print("retriever response:")
-print(retriever_response[0])
+print(retriever_response)
 # Execute a query
 query_engine = graph_index.as_query_engine(
     llm=Settings.llm,
