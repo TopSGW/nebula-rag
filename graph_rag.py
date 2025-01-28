@@ -50,7 +50,6 @@ storage_context = StorageContext.from_defaults(property_graph_store=property_gra
 
 # Initialize the PropertyGraphIndex
 graph_index = PropertyGraphIndex.from_existing(
-    storage_context=storage_context,
     property_graph_store=property_graph_store
 )
 
