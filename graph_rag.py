@@ -7,7 +7,7 @@ from llama_index.core import PropertyGraphIndex, StorageContext, Settings
 from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.core.indices.property_graph.sub_retrievers.llm_synonym import LLMSynonymRetriever
 from llama_index.core.indices.property_graph.sub_retrievers.vector import VectorContextRetriever
-from llama_index.graph_stores.nebula import NebulaGraphStore
+from llama_index.graph_stores.nebula import NebulaPropertyGraphStore
 from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
 import nest_asyncio
@@ -41,27 +41,30 @@ space_name = "rag_workshop"
 edge_types, rel_prop_names = ["relationship"], ["relationship"]
 tags = ["entity"]
 
-graph_store = NebulaGraphStore(
-    space_name=space_name,
+property_graph_store = NebulaPropertyGraphStore(
+    space=space_name,
     edge_types=edge_types,
     rel_prop_names=rel_prop_names,
     tags=tags
 )
 
-storage_context = StorageContext.from_defaults(graph_store=graph_store)
+storage_context = StorageContext.from_defaults(property_graph_store=property_graph_store)
 
 # Initialize the PropertyGraphIndex
-graph_index = PropertyGraphIndex.from_existing(storage_context=storage_context)
+graph_index = PropertyGraphIndex.from_existing(
+    storage_context=storage_context,
+    property_graph_store=property_graph_store
+)
 
 # Configure sub-retrievers
 llm_synonym_retriever = LLMSynonymRetriever(
-    graph_store=graph_store,
+    graph_store=property_graph_store,
     llm=Settings.llm,
     include_text=True,
 )
 
 vector_context_retriever = VectorContextRetriever(
-    graph_store=graph_store,
+    graph_store=property_graph_store,
     embed_model=Settings.embed_model,
     include_text=True,
     similarity_top_k=2,
