@@ -3,8 +3,7 @@ import logging
 import sys
 from dotenv import load_dotenv
 
-from llama_index.core import PropertyGraphIndex, StorageContext, Settings
-from llama_index.core.query_engine import RetrieverQueryEngine
+from llama_index.core import PropertyGraphIndex, Settings
 from llama_index.graph_stores.nebula import NebulaPropertyGraphStore
 from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
@@ -57,15 +56,6 @@ graph_index = PropertyGraphIndex.from_existing(
     show_progress=True
 )
 
-# Set up the query engine
-retriever = graph_index.as_retriever(
-    include_text=False,
-    similarity_top_k=2,
-)
-
-retriever_response = retriever.retrieve("Who are the founders of BlackRock?")
-print("retriever response:")
-print(retriever_response)
 # Execute a query
 query_engine = graph_index.as_query_engine(
     llm=Settings.llm,
@@ -75,11 +65,3 @@ response = query_engine.query("Who are the founders of BlackRock?")
 
 print('Answer is:')
 print(str(response))
-
-query_engine2 = RetrieverQueryEngine.from_args(
-    retriever=retriever,
-    llm=Settings.llm
-)
-
-res = query_engine2.query("Who are the founders of BlackRock?")
-print(res)

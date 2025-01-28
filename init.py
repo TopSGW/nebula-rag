@@ -74,20 +74,7 @@ pg_index = PropertyGraphIndex.from_documents(
 )
 pg_index.storage_context.vector_store.persist("./storage_graph/nebula_vec_store.json")
 
-# Set up the retriever
-retriever = pg_index.as_retriever(
-    include_text=False,
-    similarity_top_k=2,
-)
-
 question = "Who are the founders of BlackRock?"
-
-print(f"{question}")
-
-response = retriever.retrieve(question)
-
-print("The Answer is:")
-print(response)
 
 query_engine = pg_index.as_query_engine(
     llm=Settings.llm,
