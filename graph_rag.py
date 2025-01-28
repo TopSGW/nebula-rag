@@ -53,14 +53,15 @@ property_graph_store = NebulaPropertyGraphStore(
 # Initialize the PropertyGraphIndex
 graph_index = PropertyGraphIndex.from_existing(
     property_graph_store=property_graph_store,
-    vector_store=vec_store
+    vector_store=vec_store,
+    llm=Settings.llm
 )
-
 
 # Set up the query engine
 retriever = graph_index.as_retriever(
     include_text=False,
     similarity_top_k=2,
+    llm=Settings.llm
 )
 
 retriever_response = retriever.retrieve("Who are the founders of BlackRock?")
@@ -75,3 +76,11 @@ response = query_engine.query("Who are the founders of BlackRock?")
 
 print('Answer is:')
 print(str(response))
+
+query_engine2 = RetrieverQueryEngine.from_args(
+    retriever=retriever,
+    llm=Settings.llm
+)
+
+res = query_engine2.query("Who are the founders of BlackRock?")
+print(res)
