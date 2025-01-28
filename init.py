@@ -17,7 +17,7 @@ from llama_index.core import (
 )
 
 from llama_index.core.storage import StorageContext
-from llama_index.graph_stores.nebula import NebulaGraphStore
+from llama_index.graph_stores.nebula import NebulaGraphStore, NebulaPropertyGraphStore
 from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.core.vector_stores.simple import SimpleVectorStore
@@ -51,11 +51,8 @@ space_name = "rag_workshop"
 edge_types, rel_prop_names = ["relationship"], ["relationship"]
 tags = ["entity"]
 
-graph_store = NebulaGraphStore(
-    space_name=space_name,
-    edge_types=edge_types,
-    rel_prop_names=rel_prop_names,
-    tags=tags
+graph_store = NebulaPropertyGraphStore(
+    space="llamaindex_nebula_property_graph", overwrite=True
 )
 
 storage_context = StorageContext.from_defaults(graph_store=graph_store)
@@ -68,16 +65,18 @@ vec_store = SimpleVectorStore()
 pg_index = PropertyGraphIndex.from_documents(
     documents=documents,
     storage_context=storage_context,
+    property_graph_store=graph_store,
+    vector_store=vec_store,
     max_triplets_per_chunk=10,
     rel_prop_names=rel_prop_names,
     tags=tags,
-    vec_store=vec_store
+    show_progress=True
 )
 pg_index.storage_context.vector_store.persist("./storage_graph/nebula_vec_store.json")
 
 # Set up the retriever
 retriever = pg_index.as_retriever(
-    include_text=True,
+    include_text=False,
     similarity_top_k=2,
 )
 
@@ -91,7 +90,8 @@ print("The Answer is:")
 print(response)
 
 query_engine = pg_index.as_query_engine(
-    llm=Settings.llm
+    llm=Settings.llm,
+    include_text=True
 )
 
 query_response = query_engine.query(question)

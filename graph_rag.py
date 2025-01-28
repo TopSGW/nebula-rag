@@ -9,7 +9,6 @@ from llama_index.graph_stores.nebula import NebulaPropertyGraphStore
 from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.core.vector_stores.simple import SimpleVectorStore
-
 import nest_asyncio
 
 nest_asyncio.apply()
@@ -47,10 +46,8 @@ tags = ["entity"]
 vec_store = SimpleVectorStore.from_persist_path("./storage_graph/nebula_vec_store.json")
 
 property_graph_store = NebulaPropertyGraphStore(
-    space=space_name,
+    space="llamaindex_nebula_property_graph",
 )
-print("property graph store:")
-print(property_graph_store)
 
 # Initialize the PropertyGraphIndex
 graph_index = PropertyGraphIndex.from_existing(
@@ -59,9 +56,6 @@ graph_index = PropertyGraphIndex.from_existing(
     llm=Settings.llm,
     show_progress=True
 )
-
-print("property graph index:")
-print(graph_index)
 
 # Set up the query engine
 retriever = graph_index.as_retriever(
