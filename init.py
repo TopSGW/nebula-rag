@@ -28,7 +28,7 @@ os.environ['NEBULA_USER'] = os.getenv('NEBULA_USER')
 os.environ['NEBULA_PASSWORD'] = os.getenv('NEBULA_PASSWORD')
 os.environ['NEBULA_ADDRESS'] = os.getenv('NEBULA_ADDRESS')
 
-print(f"text .env : NEBULA_ADDRESS: {os.getenv['NEBULA_USER']} : {os.getenv['NEBULA_ADDRESS']}")
+print(f"text .env : NEBULA_ADDRESS: {os.getenv('NEBULA_USER')} : {os.getenv('NEBULA_ADDRESS')}")
 Settings.llm = Ollama(
     model="llama3.3:70b",
     temperature=0.3,
