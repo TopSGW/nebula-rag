@@ -51,7 +51,7 @@ graph_store = NebulaGraphStore(
 storage_context = StorageContext.from_defaults(graph_store=graph_store)
 
 # Initialize the PropertyGraphIndex
-graph_index = PropertyGraphIndex(storage_context=storage_context)
+graph_index = PropertyGraphIndex.from_existing(storage_context=storage_context)
 
 # Configure sub-retrievers
 llm_synonym_retriever = LLMSynonymRetriever(
