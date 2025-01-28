@@ -31,8 +31,6 @@ os.environ['NEBULA_USER'] = os.getenv('NEBULA_USER')
 os.environ['NEBULA_PASSWORD'] = os.getenv('NEBULA_PASSWORD')
 os.environ['NEBULA_ADDRESS'] = os.getenv('NEBULA_ADDRESS')
 
-print(f"text .env : NEBULA_ADDRESS: {os.getenv('NEBULA_USER')} : {os.getenv('NEBULA_ADDRESS')}")
-
 Settings.llm = Ollama(
     model="llama3.3:70b",
     temperature=0.3,
@@ -59,7 +57,7 @@ graph_store = NebulaPropertyGraphStore(
 reranker = ColbertReranker()
 
 vector_store = LanceDBVectorStore(
-    uri="./lancedb", mode="overwrite", query_type="hybrid", reranker=reranker
+    uri="./lancedb", mode="overwrite", reranker=reranker
 )
 
 storage_context = StorageContext.from_defaults(
