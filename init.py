@@ -21,7 +21,8 @@ from llama_index.graph_stores.nebula import NebulaGraphStore, NebulaPropertyGrap
 from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.core.vector_stores.simple import SimpleVectorStore
-
+from llama_index.vector_stores.lancedb import LanceDBVectorStore
+from lancedb.rerankers import ColbertReranker
 
 # Load environment variables from .env file
 load_dotenv()
@@ -55,18 +56,25 @@ graph_store = NebulaPropertyGraphStore(
     space="llamaindex_nebula_property_graph", overwrite=True
 )
 
-storage_context = StorageContext.from_defaults(graph_store=graph_store)
+reranker = ColbertReranker()
+
+vector_store = LanceDBVectorStore(
+    uri="./lancedb", mode="overwrite", query_type="hybrid", reranker=reranker
+)
+
+storage_context = StorageContext.from_defaults(
+    property_graph_store=graph_store,
+    vector_store=vector_store
+)
 
 documents = SimpleDirectoryReader("./data/blackrock").load_data()
-
-vec_store = SimpleVectorStore()
 
 # Initialize PropertyGraphIndex
 pg_index = PropertyGraphIndex.from_documents(
     documents=documents,
     storage_context=storage_context,
     property_graph_store=graph_store,
-    vector_store=vec_store,
+    vector_store=vector_store,
     max_triplets_per_chunk=10,
     rel_prop_names=rel_prop_names,
     tags=tags,
@@ -83,7 +91,10 @@ query_engine = pg_index.as_query_engine(
 
 query_response = query_engine.query(question)
 print(f"{question}")
-
 print("The response of query is:")
+print(query_response)
 
+query_response = query_engine.query("How did Larry Fink and Rob Kapito meet?")
+print(f"{question}")
+print("The response of query is:")
 print(query_response)

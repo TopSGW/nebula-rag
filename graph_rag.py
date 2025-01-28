@@ -9,6 +9,9 @@ from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.core.vector_stores.simple import SimpleVectorStore
 from llama_index.core.memory import ChatMemoryBuffer
+from llama_index.vector_stores.lancedb import LanceDBVectorStore
+from lancedb.rerankers import ColbertReranker
+
 import nest_asyncio
 
 nest_asyncio.apply()
@@ -43,7 +46,11 @@ space_name = "rag_workshop"
 edge_types, rel_prop_names = ["relationship"], ["relationship"]
 tags = ["entity"]
 
-vec_store = SimpleVectorStore.from_persist_path("./storage_graph/nebula_vec_store.json")
+reranker = ColbertReranker()
+
+vector_store = LanceDBVectorStore(
+    uri="./lancedb", mode="overwrite", query_type="hybrid", reranker=reranker
+)
 
 property_graph_store = NebulaPropertyGraphStore(
     space="llamaindex_nebula_property_graph",
@@ -52,7 +59,7 @@ property_graph_store = NebulaPropertyGraphStore(
 # Initialize the PropertyGraphIndex
 graph_index = PropertyGraphIndex.from_existing(
     property_graph_store=property_graph_store,
-    vector_store=vec_store,
+    vector_store=vector_store,
     llm=Settings.llm,
     show_progress=True
 )
@@ -87,4 +94,8 @@ print("who is Robert?")
 print(response)
 response = chat_engine.chat("who is Susan?")
 print("who is Susan?")
+print(response)
+
+response = chat_engine.chat("How did Larry Fink and Rob Kapito meet?")
+print("How did Larry Fink and Rob Kapito meet?")
 print(response)
