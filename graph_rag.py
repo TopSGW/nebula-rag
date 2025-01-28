@@ -8,6 +8,7 @@ from llama_index.graph_stores.nebula import NebulaPropertyGraphStore
 from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.core.vector_stores.simple import SimpleVectorStore
+from llama_index.core.memory import ChatMemoryBuffer
 import nest_asyncio
 
 nest_asyncio.apply()
@@ -65,3 +66,25 @@ response = query_engine.query("Who are the founders of BlackRock?")
 
 print('Answer is:')
 print(str(response))
+
+memory = ChatMemoryBuffer.from_defaults(
+    token_limit=1500,
+    llm=Settings.llm
+)
+
+chat_engine = graph_index.as_chat_engine(
+    chat_mode="context",
+    memory=memory,
+    verbose=True,
+    llm=Settings.llm
+)
+
+response = chat_engine.chat("who is Larry?")
+print("who is Larry?")
+print(response)
+response = chat_engine.chat("who is Robert?")
+print("who is Robert?")
+print(response)
+response = chat_engine.chat("who is Susan?")
+print("who is Susan?")
+print(response)
