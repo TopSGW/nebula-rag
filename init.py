@@ -32,7 +32,7 @@ os.environ['NEBULA_ADDRESS'] = os.getenv('NEBULA_ADDRESS')
 reranker = ColbertReranker()
 
 vector_store = LanceDBVectorStore(
-    uri="./lancedb", mode="overwrite", query_type="hybrid", reranker=reranker
+    uri="./lancedb", mode="overwrite", reranker=reranker
 )
 
 Settings.llm = Ollama(
