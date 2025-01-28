@@ -61,7 +61,6 @@ graph_index = PropertyGraphIndex.from_existing(
 retriever = graph_index.as_retriever(
     include_text=False,
     similarity_top_k=2,
-    llm=Settings.llm
 )
 
 retriever_response = retriever.retrieve("Who are the founders of BlackRock?")
