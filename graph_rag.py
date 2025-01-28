@@ -49,13 +49,19 @@ vec_store = SimpleVectorStore.from_persist_path("./storage_graph/nebula_vec_stor
 property_graph_store = NebulaPropertyGraphStore(
     space=space_name,
 )
+print("property graph store:")
+print(property_graph_store)
 
 # Initialize the PropertyGraphIndex
 graph_index = PropertyGraphIndex.from_existing(
     property_graph_store=property_graph_store,
     vector_store=vec_store,
-    llm=Settings.llm
+    llm=Settings.llm,
+    show_progress=True
 )
+
+print("property graph index:")
+print(graph_index)
 
 # Set up the query engine
 retriever = graph_index.as_retriever(
