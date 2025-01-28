@@ -92,7 +92,9 @@ vector_index = VectorStoreIndex.from_documents(
     show_progress=True
 )
 
-vector_query_engine = vector_index.as_query_engine()
+vector_query_engine = vector_index.as_query_engine(
+    llm=Settings.llm
+)
 
 query_response = vector_query_engine.query("Who are the founders of BlackRock?")
 
