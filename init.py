@@ -20,7 +20,7 @@ from llama_index.graph_stores.nebula import NebulaGraphStore, NebulaPropertyGrap
 from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.core.vector_stores.simple import SimpleVectorStore
-from llama_index.core.vector_stores.chroma import ChromaVectorStore
+from llama_index.vector_stores.chroma import ChromaVectorStore
 
 # Load environment variables from .env file
 load_dotenv()
