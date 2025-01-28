@@ -57,6 +57,7 @@ graph_store = NebulaPropertyGraphStore(
 )
 
 storage_context = StorageContext.from_defaults(property_graph_store=graph_store)
+vector_storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
 documents = SimpleDirectoryReader("./data/blackrock").load_data()
 
@@ -82,5 +83,19 @@ query_response = query_engine.query(question)
 print(f"{question}")
 
 print("The response of query is:")
+
+print(query_response)
+
+vector_index = VectorStoreIndex.from_documents(
+    documents=documents,
+    storage_context=vector_storage_context,
+    show_progress=True
+)
+
+vector_query_engine = vector_index.as_query_engine()
+
+query_response = vector_query_engine.query("Who are the founders of BlackRock?")
+
+print('vector answer is:')
 
 print(query_response)
