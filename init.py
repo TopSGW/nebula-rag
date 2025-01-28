@@ -83,6 +83,8 @@ retriever = pg_index.as_retriever(
 
 question = "Who are the founders of BlackRock?"
 
+print(f"{question}")
+
 response = retriever.retrieve(question)
 
 print("The Answer is:")
@@ -93,6 +95,7 @@ query_engine = pg_index.as_query_engine(
 )
 
 query_response = query_engine.query(question)
+print(f"{question}")
 
 print("The response of query is:")
 
