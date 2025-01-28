@@ -20,8 +20,8 @@ from llama_index.graph_stores.nebula import NebulaGraphStore, NebulaPropertyGrap
 from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.core.vector_stores.simple import SimpleVectorStore
-from llama_index.vector_stores.chroma import ChromaVectorStore
-
+from llama_index.vector_stores.lancedb import LanceDBVectorStore
+from lancedb.rerankers import ColbertReranker
 # Load environment variables from .env file
 load_dotenv()
 
@@ -29,13 +29,11 @@ os.environ['NEBULA_USER'] = os.getenv('NEBULA_USER')
 os.environ['NEBULA_PASSWORD'] = os.getenv('NEBULA_PASSWORD')
 os.environ['NEBULA_ADDRESS'] = os.getenv('NEBULA_ADDRESS')
 
-import chromadb
+reranker = ColbertReranker()
 
-chroma_client = chromadb.EphemeralClient()
-chroma_collection = chroma_client.create_collection("nebula-start")
-
-vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
-
+vector_store = LanceDBVectorStore(
+    uri="./lancedb", mode="overwrite", query_type="hybrid", reranker=reranker
+)
 
 Settings.llm = Ollama(
     model="llama3.3:70b",
@@ -70,7 +68,7 @@ pg_index = PropertyGraphIndex.from_documents(
     max_triplets_per_chunk=10,
     show_progress=True
 )
-pg_index.storage_context.vector_store.persist("./storage_graph/nebula_vec_store.json")
+# pg_index.storage_context.vector_store.persist("./storage_graph/nebula_vec_store.json")
 
 question = "Who are the founders of BlackRock?"
 
@@ -85,6 +83,9 @@ print(f"{question}")
 print("The response of query is:")
 
 print(query_response)
+q2_response = query_engine.query("How did Larry Fink and Rob Kapito meet?")
+print("How did Larry Fink and Rob Kapito meet?")  
+print(q2_response)
 
 vector_index = VectorStoreIndex.from_documents(
     documents=documents,
@@ -101,3 +102,7 @@ query_response = vector_query_engine.query("Who are the founders of BlackRock?")
 print('vector answer is:')
 
 print(query_response)
+
+vec_query2_response = vector_query_engine.query("How did Larry Fink and Rob Kapito meet?")
+print("How did Larry Fink and Rob Kapito meet?")
+print(vec_query2_response)
