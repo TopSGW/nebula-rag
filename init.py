@@ -2,6 +2,9 @@ import os
 import logging
 import sys
 from dotenv import load_dotenv
+import nest_asyncio
+
+nest_asyncio.apply()
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
