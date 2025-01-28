@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 
 from llama_index.core import PropertyGraphIndex, StorageContext, Settings
 from llama_index.core.query_engine import RetrieverQueryEngine
-from llama_index.core.indices.property_graph.sub_retrievers.llm_synonym import LLMSynonymRetriever
-from llama_index.core.indices.property_graph.sub_retrievers.vector import VectorContextRetriever
 from llama_index.graph_stores.nebula import NebulaPropertyGraphStore
 from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
@@ -56,29 +54,27 @@ graph_index = PropertyGraphIndex.from_existing(
     property_graph_store=property_graph_store
 )
 
-# Configure sub-retrievers
-llm_synonym_retriever = LLMSynonymRetriever(
-    graph_store=property_graph_store,
-    llm=Settings.llm,
-    include_text=True,
-)
 
-vector_context_retriever = VectorContextRetriever(
-    graph_store=property_graph_store,
-    embed_model=Settings.embed_model,
+# Set up the query engine
+retriever = graph_index.as_retriever(
     include_text=True,
     similarity_top_k=2,
 )
+query_engine = RetrieverQueryEngine.from_args(
+    retriever,
+    llm=Settings.llm
+)
 
-# Combine sub-retrievers
-sub_retrievers = [llm_synonym_retriever, vector_context_retriever]
-
-# Set up the query engine
-retriever = graph_index.as_retriever(sub_retrievers=sub_retrievers)
-query_engine = RetrieverQueryEngine.from_args(retriever)
 
 # Execute a query
 response = query_engine.query("Who are the founders of BlackRock?")
 
 print('Answer is:')
 print(response)
+
+query_engine2 = graph_index.as_query_engine(
+    llm=Settings.llm
+)
+response2 = query_engine2.query("Who are the founders of BlackRock?")
+print("Answer2 is :")
+print(response2)
