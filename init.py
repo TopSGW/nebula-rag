@@ -61,8 +61,7 @@ vector_store = LanceDBVectorStore(
 )
 
 storage_context = StorageContext.from_defaults(
-    property_graph_store=graph_store,
-    vector_store=vector_store
+    property_graph_store=graph_store
 )
 
 documents = SimpleDirectoryReader("./data/blackrock").load_data()
@@ -92,6 +91,6 @@ print("The response of query is:")
 print(query_response)
 
 query_response = query_engine.query("How did Larry Fink and Rob Kapito meet?")
-print(f"{question}")
+print(f"How did Larry Fink and Rob Kapito meet?")
 print("The response of query is:")
 print(query_response)
