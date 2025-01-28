@@ -44,7 +44,7 @@ space_name = "rag_workshop"
 edge_types, rel_prop_names = ["relationship"], ["relationship"]
 tags = ["entity"]
 
-vec_store = SimpleVectorStore.from_persist_path("./data/nebula_vec_store.json")
+vec_store = SimpleVectorStore.from_persist_path("./storage_graph/nebula_vec_store.json")
 
 property_graph_store = NebulaPropertyGraphStore(
     space=space_name,
