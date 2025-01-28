@@ -43,9 +43,6 @@ tags = ["entity"]
 
 property_graph_store = NebulaPropertyGraphStore(
     space=space_name,
-    edge_types=edge_types,
-    rel_prop_names=rel_prop_names,
-    tags=tags
 )
 
 storage_context = StorageContext.from_defaults(property_graph_store=property_graph_store)
