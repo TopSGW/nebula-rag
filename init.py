@@ -80,7 +80,6 @@ pg_index = PropertyGraphIndex.from_documents(
     tags=tags,
     show_progress=True
 )
-pg_index.storage_context.vector_store.persist("./storage_graph/nebula_vec_store.json")
 
 question = "Who are the founders of BlackRock?"
 
