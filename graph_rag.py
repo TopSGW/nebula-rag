@@ -13,6 +13,9 @@ from llama_index.embeddings.ollama import OllamaEmbedding
 import nest_asyncio
 
 nest_asyncio.apply()
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
 # Initialize LLM and embedding model
 
 # Load environment variables from .env file
