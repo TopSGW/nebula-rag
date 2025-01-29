@@ -41,6 +41,8 @@ class HybridRAG:
     def run(self, question: str) -> str:
         question_embedding = self.vector_rag.embed(question)
         vector_docs = self.vector_rag.query(question_embedding)
+        for doc in vector_docs:
+            print(f">>>>>>>{doc}<<<<<<<")
         vector_docs = [doc["text"] for doc in vector_docs]
 
         graph_doc = self.graph_rag.run(questions=[question], mode='chat')
