@@ -56,17 +56,13 @@ graph_store = NebulaPropertyGraphStore(
 
 vector_store = SimpleVectorStore()
 
-storage_context = StorageContext.from_defaults(property_graph_store=graph_store)
-
 documents = SimpleDirectoryReader("./data/blackrock").load_data()
 
 # Initialize PropertyGraphIndex
 pg_index = PropertyGraphIndex.from_documents(
     documents=documents,
-    storage_context=storage_context,
     property_graph_store=graph_store,
     vector_store=vector_store,
-    max_triplets_per_chunk=10,
     show_progress=True
 )
 pg_index.storage_context.vector_store.persist("./storage_graph/nebula_vec_store.json")
