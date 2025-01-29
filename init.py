@@ -58,11 +58,12 @@ vector_store = SimpleVectorStore()
 
 documents = SimpleDirectoryReader("./data/blackrock").load_data()
 
+storage_context = StorageContext.from_defaults(property_graph_store=graph_store, vector_store=vector_store)
+
 # Initialize PropertyGraphIndex
 pg_index = PropertyGraphIndex.from_documents(
     documents=documents,
-    property_graph_store=graph_store,
-    vector_store=vector_store,
+    storage_context=storage_context,
     show_progress=True
 )
 pg_index.storage_context.vector_store.persist("./storage_graph/nebula_vec_store.json")
