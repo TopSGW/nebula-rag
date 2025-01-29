@@ -54,7 +54,7 @@ graph_store = NebulaPropertyGraphStore(
     space="llamaindex_nebula_property_graph", overwrite=True
 )
 
-storage_context = StorageContext.from_defaults(property_graph_store=graph_store)
+storage_context = StorageContext.from_defaults(property_graph_store=graph_store, vector_store=vector_store)
 vector_storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
 documents = SimpleDirectoryReader("./data/blackrock").load_data()
@@ -86,23 +86,3 @@ print(query_response)
 q2_response = query_engine.query("How did Larry Fink and Rob Kapito meet?")
 print("How did Larry Fink and Rob Kapito meet?")  
 print(q2_response)
-
-vector_index = VectorStoreIndex.from_documents(
-    documents, storage_context=vector_storage_context,
-    show_progress=True
-)
-
-vector_query_engine = vector_index.as_query_engine(
-    llm=Settings.llm,
-    include_text=True
-)
-
-query_response = vector_query_engine.query("Who are the founders of BlackRock?")
-
-print('vector answer is:')
-
-print(query_response)
-
-vec_query2_response = vector_query_engine.query("How did Larry Fink and Rob Kapito meet?")
-print("How did Larry Fink and Rob Kapito meet?")
-print(vec_query2_response)
