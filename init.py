@@ -29,11 +29,11 @@ os.environ['NEBULA_USER'] = os.getenv('NEBULA_USER')
 os.environ['NEBULA_PASSWORD'] = os.getenv('NEBULA_PASSWORD')
 os.environ['NEBULA_ADDRESS'] = os.getenv('NEBULA_ADDRESS')
 
-reranker = ColbertReranker()
+# reranker = ColbertReranker()
 
-vector_store = LanceDBVectorStore(
-    uri="./lancedb", mode="overwrite", reranker=reranker
-)
+# vector_store = LanceDBVectorStore(
+#     uri="./lancedb", mode="overwrite", reranker=reranker
+# )
 
 Settings.llm = Ollama(
     model="llama3.3:70b",
@@ -54,8 +54,9 @@ graph_store = NebulaPropertyGraphStore(
     space="llamaindex_nebula_property_graph", overwrite=True
 )
 
-storage_context = StorageContext.from_defaults(property_graph_store=graph_store, vector_store=vector_store)
-vector_storage_context = StorageContext.from_defaults(vector_store=vector_store)
+vector_store = SimpleVectorStore()
+
+storage_context = StorageContext.from_defaults(property_graph_store=graph_store)
 
 documents = SimpleDirectoryReader("./data/blackrock").load_data()
 
@@ -68,7 +69,7 @@ pg_index = PropertyGraphIndex.from_documents(
     max_triplets_per_chunk=10,
     show_progress=True
 )
-# pg_index.storage_context.vector_store.persist("./storage_graph/nebula_vec_store.json")
+pg_index.storage_context.vector_store.persist("./storage_graph/nebula_vec_store.json")
 
 question = "Who are the founders of BlackRock?"
 
