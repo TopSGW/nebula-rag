@@ -88,8 +88,7 @@ print("How did Larry Fink and Rob Kapito meet?")
 print(q2_response)
 
 vector_index = VectorStoreIndex.from_documents(
-    documents=documents,
-    storage_context=vector_storage_context,
+    documents, storage_context=vector_storage_context,
     show_progress=True
 )
 
