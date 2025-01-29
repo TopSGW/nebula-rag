@@ -13,76 +13,125 @@ from llama_index.core.memory import ChatMemoryBuffer
 import nest_asyncio
 
 nest_asyncio.apply()
-
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-# Initialize LLM and embedding model
+class GraphRAG:
+    def __init__(self):
+        load_dotenv()
+        
+        # Load Nebula environment variables
+        os.environ['NEBULA_USER'] = os.getenv('NEBULA_USER')
+        os.environ['NEBULA_PASSWORD'] = os.getenv('NEBULA_PASSWORD')
+        os.environ['NEBULA_ADDRESS'] = os.getenv('NEBULA_ADDRESS')
+        
+        self.setup_llm()
+        self.setup_graph_index()
+        self.memory = None
+        self.chat_engine = None
 
-# Load environment variables from .env file
-load_dotenv()
+    def setup_llm(self):
+        """Configure LLM and embedding settings"""
+        Settings.llm = Ollama(
+            model="llama3.3:70b",
+            temperature=0.3,
+            request_timeout=120.0,
+            base_url="http://localhost:11434"
+        )
 
-os.environ['NEBULA_USER'] = os.getenv('NEBULA_USER')
-os.environ['NEBULA_PASSWORD'] = os.getenv('NEBULA_PASSWORD')
-os.environ['NEBULA_ADDRESS'] = os.getenv('NEBULA_ADDRESS')
+        Settings.embed_model = OllamaEmbedding(
+            model_name="llama3.3:70b",
+            base_url="http://localhost:11434",
+        )
 
-Settings.llm = Ollama(
-    model="llama3.3:70b",
-    temperature=0.3,
-    request_timeout=120.0,
-    base_url="http://localhost:11434"
-)
+    def setup_graph_index(self):
+        """Initialize the graph index with vector store and property graph store"""
+        vec_store = SimpleVectorStore.from_persist_path("./storage_graph/nebula_vec_store.json")
+        
+        property_graph_store = NebulaPropertyGraphStore(
+            space="llamaindex_nebula_property_graph",
+        )
 
-Settings.embed_model = OllamaEmbedding(
-    model_name="llama3.3:70b",
-    base_url="http://localhost:11434",
-)
+        self.graph_index = PropertyGraphIndex.from_existing(
+            property_graph_store=property_graph_store,
+            vector_store=vec_store,
+            llm=Settings.llm,
+            show_progress=True
+        )
 
-vec_store = SimpleVectorStore.from_persist_path("./storage_graph/nebula_vec_store.json")
+    def create_query_engine(self):
+        """Create and return a query engine"""
+        return self.graph_index.as_query_engine(
+            llm=Settings.llm,
+            include_text=True
+        )
 
-property_graph_store = NebulaPropertyGraphStore(
-    space="llamaindex_nebula_property_graph",
-)
+    def create_chat_engine(self):
+        """Create and configure the chat engine"""
+        if not self.memory:
+            self.memory = ChatMemoryBuffer.from_defaults(
+                token_limit=1500,
+                llm=Settings.llm
+            )
 
-# Initialize the PropertyGraphIndex
-graph_index = PropertyGraphIndex.from_existing(
-    property_graph_store=property_graph_store,
-    vector_store=vec_store,
-    llm=Settings.llm,
-    show_progress=True
-)
+        self.chat_engine = self.graph_index.as_chat_engine(
+            chat_mode="context",
+            memory=self.memory,
+            verbose=True,
+            llm=Settings.llm
+        )
 
-# Execute a query
-query_engine = graph_index.as_query_engine(
-    llm=Settings.llm,
-    include_text=True
-)
-response = query_engine.query("Who are the founders of BlackRock?")
+    def query(self, question: str) -> str:
+        """Execute a single query"""
+        query_engine = self.create_query_engine()
+        response = query_engine.query(question)
+        return str(response)
 
-print('Answer is:')
-print(str(response))
+    def chat(self, message: str) -> str:
+        """Handle chat interactions"""
+        if not self.chat_engine:
+            self.create_chat_engine()
+        response = self.chat_engine.chat(message)
+        return str(response)
 
-memory = ChatMemoryBuffer.from_defaults(
-    token_limit=1500,
-    llm=Settings.llm
-)
+    def run(self, questions: list[str], mode: str = "query") -> list[str]:
+        """
+        Run multiple questions in either query or chat mode
+        mode: "query" or "chat"
+        """
+        responses = []
+        for question in questions:
+            if mode == "chat":
+                response = self.chat(question)
+            else:
+                response = self.query(question)
+            responses.append(f"Q: {question}\nA: {response}")
+        return responses
 
-chat_engine = graph_index.as_chat_engine(
-    chat_mode="context",
-    memory=memory,
-    verbose=True,
-    llm=Settings.llm
-)
 
-response = chat_engine.chat("who is Larry?")
-print("who is Larry?")
-print(response)
-response = chat_engine.chat("who is Robert?")
-print("who is Robert?")
-print(response)
-response = chat_engine.chat("who is Susan?")
-print("who is Susan?")
-print(response)
-
-response = chat_engine.chat("How did Larry Fink and Rob Kapito meet?")
-print("How did Larry Fink and Rob Kapito meet?")
-print(response)
+if __name__ == "__main__":
+    # Initialize the GraphRAG
+    graph_rag = GraphRAG()
+    
+    # Example queries
+    questions = [
+        "Who are the founders of BlackRock?",
+        "How did Larry Fink and Rob Kapito meet?"
+    ]
+    
+    # Run in query mode
+    print("Query Mode Results:")
+    results = graph_rag.run(questions, mode="query")
+    for result in results:
+        print(f"\n{result}\n---")
+    
+    # Run in chat mode
+    print("\nChat Mode Results:")
+    chat_questions = [
+        "who is Larry?",
+        "who is Robert?",
+        "who is Susan?",
+        "How did Larry Fink and Rob Kapito meet?"
+    ]
+    results = graph_rag.run(chat_questions, mode="chat")
+    for result in results:
+        print(f"\n{result}\n---")
