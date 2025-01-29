@@ -47,12 +47,11 @@ vec_store = SimpleVectorStore.from_persist_path("./storage_graph/nebula_vec_stor
 property_graph_store = NebulaPropertyGraphStore(
     space="llamaindex_nebula_property_graph",
 )
-storage_context = StorageContext.from_defaults(property_graph_store=property_graph_store, vector_store=vec_store)
 
 # Initialize the PropertyGraphIndex
 graph_index = PropertyGraphIndex.from_existing(
     property_graph_store=property_graph_store,
-    storage_context=storage_context,
+    vector_store=vec_store,
     llm=Settings.llm,
     show_progress=True
 )
