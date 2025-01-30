@@ -10,6 +10,12 @@ from llama_index.embeddings.clip import ClipEmbedding
 from llama_index.core.prompts import PromptTemplate
 from llama_index.core.query_engine import SimpleMultiModalQueryEngine
 import qdrant_client
+from llama_index.embeddings.ollama import OllamaEmbedding
+
+text_embed_model = OllamaEmbedding(
+    model_name="llama3.3:70b",
+    base_url="http://localhost:11434",
+)
 
 client = qdrant_client.QdrantClient(path="qdrant_mm_db")
 
@@ -35,7 +41,8 @@ documents = SimpleDirectoryReader("./mixed_wiki/").load_data()
 mm_index = MultiModalVectorStoreIndex.from_documents(
     documents,
     storage_context=storage_context,
-    image_embed_model=image_embed_model    
+    image_embed_model=image_embed_model,    
+    embed_model=text_embed_model
 )
 
 qa_tmpl_str = (
