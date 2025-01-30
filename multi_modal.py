@@ -50,7 +50,6 @@ text_embed_model = embed_model = OllamaEmbedding(
     base_url="http://localhost:11434",
 )
 
-
 try:
     # Load documents
     documents = SimpleDirectoryReader("./mixed_wiki/").load_data()
@@ -84,9 +83,20 @@ try:
     query_str = "Tell me more about the Porsche"
     try:
         response = mm_query_engine.query(query_str)
-        print("Response:", str(response))
+        # Handle response directly as a string
+        response_text = str(response)
+        print("Response:", response_text)
+        
+        # You can also access specific attributes if needed
+        if hasattr(response, 'response'):
+            print("Response text:", response.response)
+        if hasattr(response, 'source_nodes'):
+            print("Source nodes:", len(response.source_nodes))
+            
     except Exception as e:
         print(f"Query error: {str(e)}")
+        logging.error(f"Detailed error during query: {e}", exc_info=True)
 
 except Exception as e:
     print(f"Setup error: {str(e)}")
+    logging.error(f"Detailed error during setup: {e}", exc_info=True)
